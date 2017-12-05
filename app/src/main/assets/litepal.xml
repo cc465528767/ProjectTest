@@ -1,0 +1,13 @@
+<litepal>
+
+    <dbname value="practice_weather"/>
+
+    <version value="1"/>
+
+    <list>
+        <mapping class="com.dreamkong.pracricewearher.db.Province"/>
+        <mapping class="com.dreamkong.pracricewearher.db.City"/>
+        <mapping class="com.dreamkong.pracricewearher.db.County"/>
+    </list>
+
+</litepal>
