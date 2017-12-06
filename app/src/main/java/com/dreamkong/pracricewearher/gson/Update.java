@@ -1,7 +1,7 @@
 package com.dreamkong.pracricewearher.gson;
 
 /**
- * @author bsbj
+ * @author dk
  * @date 2017/12/6.
  */
 

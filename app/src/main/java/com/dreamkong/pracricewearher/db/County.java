@@ -3,7 +3,7 @@ package com.dreamkong.pracricewearher.db;
 import org.litepal.crud.DataSupport;
 
 /**
- * @author bsbj
+ * @author dk
  * @date 2017/12/5.
  */
 

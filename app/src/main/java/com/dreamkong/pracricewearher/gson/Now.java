@@ -3,7 +3,7 @@ package com.dreamkong.pracricewearher.gson;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * @author bsbj
+ * @author dk
  * @date 2017/12/6.
  */
 

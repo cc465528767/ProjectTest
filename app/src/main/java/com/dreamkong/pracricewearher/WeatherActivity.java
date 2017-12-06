@@ -1,5 +1,6 @@
 package com.dreamkong.pracricewearher;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -23,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.dreamkong.pracricewearher.gson.Forecast;
 import com.dreamkong.pracricewearher.gson.Lifestyle;
 import com.dreamkong.pracricewearher.gson.Weather;
+import com.dreamkong.pracricewearher.service.AutoUpdateService;
 import com.dreamkong.pracricewearher.util.HttpUtil;
 import com.dreamkong.pracricewearher.util.Utility;
 
@@ -184,58 +186,66 @@ public class WeatherActivity extends AppCompatActivity {
      * 处理并展示Weather实体类中的数据
      */
     private void showWeatherInfo(Weather weather) {
-        String cityName = weather.getBasic().getLocation();
-        String updateTime = weather.getUpdate().getLoc();
-        String degree = weather.getNow().getTmp() + "度";
-        String weatherInfo = weather.getNow().getCondTxt();
+        if (weather != null && "ok".equals(weather.getStatus())) {
+            String cityName = weather.getBasic().getLocation();
+            String updateTime = weather.getUpdate().getLoc();
+            String degree = weather.getNow().getTmp() + "度";
+            String weatherInfo = weather.getNow().getCondTxt();
 
-        titleCity.setText(cityName);
-        titleUpdateTime.setText(updateTime);
-        degreeText.setText(degree);
-        weatherInfoText.setText(weatherInfo);
+            titleCity.setText(cityName);
+            titleUpdateTime.setText(updateTime);
+            degreeText.setText(degree);
+            weatherInfoText.setText(weatherInfo);
 
-        forecastLayout.removeAllViews();
-        for (Forecast forecast : weather.getDaily_forecast()) {
-            View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
-            TextView dateText = view.findViewById(R.id.date_text);
-            TextView infoText = view.findViewById(R.id.info_text);
-            TextView maxText = view.findViewById(R.id.max_text);
-            TextView minText = view.findViewById(R.id.min_text);
+            forecastLayout.removeAllViews();
+            for (Forecast forecast : weather.getDaily_forecast()) {
+                View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
+                TextView dateText = view.findViewById(R.id.date_text);
+                TextView infoText = view.findViewById(R.id.info_text);
+                TextView maxText = view.findViewById(R.id.max_text);
+                TextView minText = view.findViewById(R.id.min_text);
 
-            dateText.setText(forecast.getDate());
-            infoText.setText(forecast.getCondTxtD());
-            maxText.setText(forecast.getTmpMax());
-            minText.setText(forecast.getTmpMin());
-            forecastLayout.addView(view);
-        }
-        List<Lifestyle> lifestyleList = weather.getLifestyle();
-        String comfort = null;
-        String uv = null;
-        String sport = null;
-        String carWash = null;
-        for (Lifestyle l : lifestyleList) {
-            switch (l.getType()) {
-                case "comf":
-                    comfort = "舒适度： " + l.getTxt();
-                    break;
-                case "uv":
-                    uv = "紫外线： " + l.getTxt();
-                    break;
-                case "sport":
-                    sport = "运动建议： " + l.getTxt();
-                    break;
-                case "cw":
-                    carWash = "洗车建议： " + l.getTxt();
-                    break;
-                default:
-                    break;
+                dateText.setText(forecast.getDate());
+                infoText.setText(forecast.getCondTxtD());
+                maxText.setText(forecast.getTmpMax());
+                minText.setText(forecast.getTmpMin());
+                forecastLayout.addView(view);
             }
+            List<Lifestyle> lifestyleList = weather.getLifestyle();
+            String comfort = null;
+            String uv = null;
+            String sport = null;
+            String carWash = null;
+            for (Lifestyle l : lifestyleList) {
+                switch (l.getType()) {
+                    case "comf":
+                        comfort = "舒适度： " + l.getTxt();
+                        break;
+                    case "uv":
+                        uv = "紫外线： " + l.getTxt();
+                        break;
+                    case "sport":
+                        sport = "运动建议： " + l.getTxt();
+                        break;
+                    case "cw":
+                        carWash = "洗车建议： " + l.getTxt();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            comfortText.setText(comfort);
+            uvText.setText(uv);
+            sportText.setText(sport);
+            washText.setText(carWash);
+            scrollLayout.setVisibility(View.VISIBLE);
+
+            // 开启后台自动更新服务
+            Intent intent = new Intent(this, AutoUpdateService.class);
+            startService(intent);
+        } else {
+            Toast.makeText(this, "获取失败", Toast.LENGTH_SHORT).show();
         }
-        comfortText.setText(comfort);
-        uvText.setText(uv);
-        sportText.setText(sport);
-        washText.setText(carWash);
-        scrollLayout.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.nav_button)
