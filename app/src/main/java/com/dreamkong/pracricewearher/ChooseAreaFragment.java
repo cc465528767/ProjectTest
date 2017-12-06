@@ -1,6 +1,7 @@
 package com.dreamkong.pracricewearher;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -105,6 +106,19 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(i);
                     queryCounties();
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String location = countyList.get(i).getCountyName();
+                    if (getActivity() instanceof MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("location", location);
+                        startActivity(intent);
+                        getActivity().finish();
+                    } else if (getActivity() instanceof WeatherActivity) {
+                        WeatherActivity weatherActivity = (WeatherActivity) getActivity();
+                        weatherActivity.drawerLayout.closeDrawers();
+                        weatherActivity.swipeRefresh.setRefreshing(true);
+                        weatherActivity.requestWeather(location);
+                    }
                 }
             }
         });
@@ -218,7 +232,7 @@ public class ChooseAreaFragment extends Fragment {
                             if ("province".equals(type)) {
                                 queryProvinces();
                             } else if ("city".equals(type)) {
-                                queryCites();
+                                queryCities();
                             } else if ("county".equals(type)) {
                                 queryCounties();
                             }
