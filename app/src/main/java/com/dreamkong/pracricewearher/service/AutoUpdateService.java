@@ -9,8 +9,6 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-import com.bumptech.glide.Glide;
-import com.dreamkong.pracricewearher.WeatherActivity;
 import com.dreamkong.pracricewearher.gson.Weather;
 import com.dreamkong.pracricewearher.util.HttpUtil;
 import com.dreamkong.pracricewearher.util.Utility;
@@ -43,14 +41,16 @@ public class AutoUpdateService extends Service {
         long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
         Intent i = new Intent(this, AutoUpdateService.class);
         PendingIntent pi = PendingIntent.getService(this, 0, i, 0);
-        manager.cancel(pi);
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        if (manager != null) {
+            manager.cancel(pi);
+            manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void updateBingPic() {
         String requestBingPic = "http://guolin.tech/api/bing_pic";
-        HttpUtil.sendOkhttpRequest(requestBingPic, new Callback() {
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -74,7 +74,7 @@ public class AutoUpdateService extends Service {
             Weather weather = Utility.handleWeatherResponse(weatherString);
             String location = weather.getBasic().getLocation();
             String weatherUrl = "https://free-api.heweather.com/s6/weather?key=f5ce9a9ae183445c8aa63e2c71012462&location=" + location;
-            HttpUtil.sendOkhttpRequest(weatherUrl, new Callback() {
+            HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     e.printStackTrace();
